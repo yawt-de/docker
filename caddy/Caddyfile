@@ -1,0 +1,15 @@
+:80 {
+    # serve static files that do not need to be processed via fpm directly using caddy
+    root * /var/www/html/public
+    file_server
+
+    # api (server) plattform processed by fpm docker-container
+    php_fastcgi server:9000
+}
+
+:81 {
+    # database admin panel provided by phpMyAdmin
+    reverse_proxy * dbadmin {
+        header_up X-Forwarded-Proto http
+    }
+}

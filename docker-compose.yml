@@ -1,0 +1,51 @@
+services:
+
+  caddy:
+    build:
+      args:
+        user: yawt
+        uid: 1000
+      context: caddy/
+      dockerfile: Dockerfile
+    user: "1000"
+    restart: always
+    ports:
+      - 8000:80
+    volumes:
+      - ../server:/var/www/html
+
+  server:
+    build:
+      args:
+        user: yawt
+        uid: 1000
+      context: server/
+      dockerfile: Dockerfile
+    user: "1000"
+    restart: always
+    volumes:
+      - ../server:/var/www/html
+
+  database:
+    image: mariadb:10.11
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    restart: always
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=yawt
+      - MYSQL_USER=yawt
+      - MYSQL_ROOT_PASSWORD=yawt
+      - MYSQL_PASSWORD=yawt
+
+  dbadmin:
+    image: phpmyadmin
+    restart: always
+    environment:
+      - PMA_HOSTS=database
+      - PMA_PORT=3306
+      - PMA_USER=yawt
+      - PMA_PASSWORD=yawt
+
+volumes:
+  mariadb_data:
